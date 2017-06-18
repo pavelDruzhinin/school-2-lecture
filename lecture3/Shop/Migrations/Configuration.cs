@@ -26,6 +26,7 @@ namespace Shop.Migrations
             //      new Person { FullName = "Rowan Miller" }
             //    );
             //
+            
         }
     }
 }
