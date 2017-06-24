@@ -1,0 +1,54 @@
+﻿@model lecture_5.Models.Order
+@{
+    ViewBag.Title = "Index";
+}
+@section scripts
+{
+    <script>
+        $('.delete').on("click",
+            function(event) {
+                var check = confirm("Вы хотите удалить товар.");
+                console.log(event, this);
+                if (check) {
+                    $(this).parent().parent().remove();
+                }
+            });
+        $('.plus').on("click",
+            function() {
+                var count = $($(this).parent().parent().children()[1]).text();
+                count = parseInt(count) + 1;
+                $($(this).parent().parent().children()[1]).text(count);
+            });
+        $('.minus').on("click",
+            function () {
+                var count = $($(this).parent().parent().children()[1]).text();
+                if (parseInt(count) > 0) {
+                    count = parseInt(count) - 1;
+                    $($(this).parent().parent().children()[1]).text(count);
+                }
+            });
+    </script> 
+}
+
+<h2>Index</h2>
+
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <td>Название</td>
+        <td>Количество</td>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var order in Model.OrderPositions) {
+        <tr id="@order.Id">
+            <td>@order.Product.Name</td>
+            <td class="count">@order.Count</td>
+            <td><button class="delete">Удалить</button></td>
+            <td><button class="plus">+</button></td>
+            <td><button class="minus">-</button></td>
+        </tr>
+    }
+    </tbody>
+</table>
+
