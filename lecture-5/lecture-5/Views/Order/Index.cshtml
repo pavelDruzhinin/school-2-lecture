@@ -5,50 +5,82 @@
 @section scripts
 {
     <script>
+        function changeCountSpan(step) {
+            var $countSpan = $(this).parents('td').children('span.count');
+            var count = $countSpan.text();
+
+            var $sum = $(this).parents('tr').children('td.sum');
+            var $price = $(this).parents('tr').children('td.price');
+            var $totalSum = $('#totalSum');
+
+            var totalSum = parseFloat($totalSum.text());
+            var price = parseFloat($price.text());
+
+            count = parseInt(count) + step;
+            if (count < 0)
+                return;
+
+            if (step == -1) {
+                totalSum -= price;
+            } else {
+                totalSum += price;
+            }
+
+            $totalSum.text(totalSum + ',00');
+            $sum.text((count * price) + ',00');
+            $countSpan.text(count);
+        }
+
         $('.delete').on("click",
-            function(event) {
+            function (event) {
                 var check = confirm("Вы хотите удалить товар.");
                 console.log(event, this);
                 if (check) {
-                    $(this).parent().parent().remove();
+                    var $orderPosition = $(this).parents('tr');
+
+                    $.get('/Order/DeleteOrderPosition?orderPositionId=' + $orderPosition[0].id,
+                        function (response) {
+                            console.log(response);
+                            $orderPosition.remove();
+                        });
                 }
             });
         $('.plus').on("click",
-            function() {
-                var count = $($(this).parent().parent().children()[1]).text();
-                count = parseInt(count) + 1;
-                $($(this).parent().parent().children()[1]).text(count);
+            function () {
+                changeCountSpan.call(this, 1);
             });
         $('.minus').on("click",
             function () {
-                var count = $($(this).parent().parent().children()[1]).text();
-                if (parseInt(count) > 0) {
-                    count = parseInt(count) - 1;
-                    $($(this).parent().parent().children()[1]).text(count);
-                }
+                changeCountSpan.call(this, -1);
             });
-    </script> 
+    </script>
 }
 
 <h2>Index</h2>
 
 <table class="table table-bordered">
     <thead>
-    <tr>
-        <td>Название</td>
-        <td>Количество</td>
-    </tr>
+        <tr>
+            <td>Название</td>
+            <td>Цена</td>
+            <td>Количество</td>
+            <td>Сумма</td>
+        </tr>
     </thead>
     <tbody>
-    @foreach (var order in Model.OrderPositions) {
-        <tr id="@order.Id">
-            <td>@order.Product.Name</td>
-            <td class="count">@order.Count</td>
-            <td><button class="delete">Удалить</button></td>
-            <td><button class="plus">+</button></td>
-            <td><button class="minus">-</button></td>
+        @foreach (var order in Model.OrderPositions)
+        {
+            <tr id="@order.Id">
+                <td>@order.Product.Name</td>
+                <td class="price">@order.Product.Price</td>
+                <td><button class="plus">+</button><span class="count">@order.Count</span><button class="minus">-</button></td>
+                <td class="sum">@(order.Product.Price * order.Count)</td>
+                <td><button class="delete">Удалить</button></td>
+            </tr>
+        }
+        <tr>
+            <td colspan="3">Итоговая сумма</td>
+            <td id="totalSum">@Model.OrderPositions.Sum(x => x.Product.Price * x.Count)</td>
         </tr>
-    }
     </tbody>
 </table>
-

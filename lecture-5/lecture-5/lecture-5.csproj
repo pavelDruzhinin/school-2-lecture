@@ -143,6 +143,10 @@
     <Compile Include="Migrations\201706241219239_fixProduct.Designer.cs">
       <DependentUpon>201706241219239_fixProduct.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201706251207585_AddPrice.cs" />
+    <Compile Include="Migrations\201706251207585_AddPrice.Designer.cs">
+      <DependentUpon>201706251207585_AddPrice.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Customer.cs" />
     <Compile Include="Models\Order.cs" />
@@ -157,8 +161,12 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Scripts\angular-mocks.js" />
+    <Content Include="Scripts\angular.js" />
+    <Content Include="Scripts\angular.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\angular.min.js.map" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -209,6 +217,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201706241219239_fixProduct.resx">
       <DependentUpon>201706241219239_fixProduct.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706251207585_AddPrice.resx">
+      <DependentUpon>201706251207585_AddPrice.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
