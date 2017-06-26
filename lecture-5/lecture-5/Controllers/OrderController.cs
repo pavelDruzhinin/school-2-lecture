@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Web.Mvc;
 using lecture_5.DataAccess;
+using lecture_5.Models;
 
 namespace lecture_5.Controllers
 {
@@ -17,7 +18,7 @@ namespace lecture_5.Controllers
         // GET: Order
         public ActionResult Index()
         {
-            return View(_db.Orders.Include(x => x.OrderPositions).Include(x => x.OrderPositions.Select(y => y.Product)).FirstOrDefault());
+            return View();
         }
 
         [HttpGet]
@@ -30,6 +31,13 @@ namespace lecture_5.Controllers
                 _db.OrderPositions.Remove(orderPosition);
                 _db.SaveChanges();
             }
+        }
+        
+        [HttpGet]
+        public ActionResult GetOrder()
+        {
+            return Json(_db.Orders.Include(x => x.OrderPositions).Include(x => x.OrderPositions.Select(y => y.Product))
+                .FirstOrDefault(), JsonRequestBehavior.AllowGet);
         }
     }
 }

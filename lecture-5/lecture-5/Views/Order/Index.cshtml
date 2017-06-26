@@ -1,64 +1,47 @@
-﻿@model lecture_5.Models.Order
-@{
+﻿@{
     ViewBag.Title = "Index";
 }
 @section scripts
 {
     <script>
-        function changeCountSpan(step) {
-            var $countSpan = $(this).parents('td').children('span.count');
-            var count = $countSpan.text();
+        (function (ng) {
 
-            var $sum = $(this).parents('tr').children('td.sum');
-            var $price = $(this).parents('tr').children('td.price');
-            var $totalSum = $('#totalSum');
+            ng.module('app', [])
+                .controller('orderCtrl', ['$scope', '$http',
+                    function ($scope, $http) {
 
-            var totalSum = parseFloat($totalSum.text());
-            var price = parseFloat($price.text());
+                        $http.get('/order/GetOrder').then(function (response) {
+                            if (response.status == 200) {
+                                $scope.order = response.data;
+                                var sum = 0;
 
-            count = parseInt(count) + step;
-            if (count < 0)
-                return;
+                                $scope.order.OrderPositions.map(function (el) {
+                                    return el.Product.Price * el.Count;
+                                }).forEach(function (el) {
+                                    sum += el;
+                                });
 
-            if (step == -1) {
-                totalSum -= price;
-            } else {
-                totalSum += price;
-            }
-
-            $totalSum.text(totalSum + ',00');
-            $sum.text((count * price) + ',00');
-            $countSpan.text(count);
-        }
-
-        $('.delete').on("click",
-            function (event) {
-                var check = confirm("Вы хотите удалить товар.");
-                console.log(event, this);
-                if (check) {
-                    var $orderPosition = $(this).parents('tr');
-
-                    $.get('/Order/DeleteOrderPosition?orderPositionId=' + $orderPosition[0].id,
-                        function (response) {
-                            console.log(response);
-                            $orderPosition.remove();
+                                $scope.totalSum = sum;
+                            }
                         });
-                }
-            });
-        $('.plus').on("click",
-            function () {
-                changeCountSpan.call(this, 1);
-            });
-        $('.minus').on("click",
-            function () {
-                changeCountSpan.call(this, -1);
-            });
+
+                        $scope.changePositionCount = function (orderPosition, step) {
+                            orderPosition.Count += step;
+
+                            $scope.totalSum += orderPosition.Product.Price * step;
+                        }
+
+                    }
+                ]);
+
+
+        })(angular);
     </script>
 }
 
 <h2>Index</h2>
 
-<table class="table table-bordered">
+<table ng-app="app" ng-controller="orderCtrl" class="table table-bordered">
     <thead>
         <tr>
             <td>Название</td>
@@ -68,19 +51,16 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var order in Model.OrderPositions)
-        {
-            <tr id="@order.Id">
-                <td>@order.Product.Name</td>
-                <td class="price">@order.Product.Price</td>
-                <td><button class="plus">+</button><span class="count">@order.Count</span><button class="minus">-</button></td>
-                <td class="sum">@(order.Product.Price * order.Count)</td>
-                <td><button class="delete">Удалить</button></td>
-            </tr>
-        }
+        <tr ng-repeat="orderPosition in order.OrderPositions">
+            <td ng-bind="orderPosition.Product.Name"></td>
+            <td ng-bind="orderPosition.Product.Price"></td>
+            <td><button ng-click="changePositionCount(orderPosition,1)">+</button><span ng-bind="orderPosition.Count"></span><button ng-click="changePositionCount(orderPosition,-1)">-</button></td>
+            <td ng-bind="orderPosition.Count * orderPosition.Product.Price"></td>
+            <td><button>Удалить</button></td>
+        </tr>
         <tr>
             <td colspan="3">Итоговая сумма</td>
-            <td id="totalSum">@Model.OrderPositions.Sum(x => x.Product.Price * x.Count)</td>
+            <td ng-bind="totalSum"></td>
         </tr>
     </tbody>
 </table>
