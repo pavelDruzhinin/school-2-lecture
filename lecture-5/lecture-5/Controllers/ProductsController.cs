@@ -12,9 +12,12 @@ namespace lecture_5.Controllers
     {
         private ShopContext db = new ShopContext();
 
-        // GET: Products
-        public ActionResult Index()
+        [HttpGet]
+        [Route("Customer/{customerId:int}/Products")]
+        public ActionResult Index(int customerId)
         {
+            ViewBag.CustomerId = customerId;
+
             return View(db.Products.ToList());
         }
 
@@ -56,19 +59,15 @@ namespace lecture_5.Controllers
             return View(product);
         }
 
-        public ActionResult AddToOrder(int productId)
+        public ActionResult AddToOrder(int productId, int customerId)
         {
-            var order = db.Orders.Include(x => x.OrderPositions).FirstOrDefault();
+            var order = db.Orders.Include(x => x.OrderPositions).FirstOrDefault(x => x.CustomerId == customerId);
 
             if (order == null)
             {
                 order = new Order
                 {
-                    Customer = new Customer
-                    {
-                        FirstName = "Test",
-                        LastName = "Testov"
-                    },
+                    CustomerId = customerId,
                     OrderPositions = new List<OrderPosition>
                     {
                         new OrderPosition
@@ -99,7 +98,7 @@ namespace lecture_5.Controllers
 
             db.SaveChanges();
 
-            return Redirect("/Order/Index");
+            return Redirect($"/Customer/{customerId}/Order/{order.Id}");
         }
 
         // GET: Products/Edit/5

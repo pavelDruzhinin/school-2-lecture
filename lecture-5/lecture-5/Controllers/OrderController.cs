@@ -14,10 +14,16 @@ namespace lecture_5.Controllers
             _db = new ShopContext();
         }
 
-        // GET: Order
-        public ActionResult Index()
+        [HttpGet]
+        [Route("Customer/{customerId:int}/Order/{orderId:int}")]
+        public ActionResult Index(int customerId, int orderId)
         {
-            return View(_db.Orders.Include(x => x.OrderPositions).Include(x => x.OrderPositions.Select(y => y.Product)).FirstOrDefault());
+            var order = _db.Orders
+                .Include(x => x.OrderPositions)
+                .Include(x => x.OrderPositions.Select(y => y.Product))
+                .FirstOrDefault(x => x.CustomerId == customerId && x.Id == orderId);
+
+            return View(order);
         }
 
         [HttpGet]
@@ -31,5 +37,22 @@ namespace lecture_5.Controllers
                 _db.SaveChanges();
             }
         }
+
+        [HttpPost]
+        public void ChangeOrderPositionCount(ChangeOrderPositionCountParams @params)
+        {
+            var orderPosition = _db.OrderPositions.Find(@params.OrderPositionId);
+
+            if (orderPosition == null) return;
+
+            orderPosition.Count += @params.Step;
+            _db.SaveChanges();
+        }
+    }
+
+    public class ChangeOrderPositionCountParams
+    {
+        public int OrderPositionId { get; set; }
+        public int Step { get; set; }
     }
 }

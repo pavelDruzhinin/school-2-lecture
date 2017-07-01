@@ -25,10 +25,20 @@
             } else {
                 totalSum += price;
             }
+            var $orderPosition = $(this).parents('tr');
 
-            $totalSum.text(totalSum + ',00');
-            $sum.text((count * price) + ',00');
-            $countSpan.text(count);
+            $.post('/order/ChangeOrderPositionCount',
+                {
+                    OrderPositionId: $orderPosition[0].id,
+                    Step: step
+                },
+                function (response) {
+                    console.log(response);
+
+                    $totalSum.text(totalSum + ',00');
+                    $sum.text((count * price) + ',00');
+                    $countSpan.text(count);
+                });
         }
 
         $('.delete').on("click",
